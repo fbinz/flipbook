@@ -1,31 +1,34 @@
 import React, {useState, useEffect, useRef} from 'react';
-import './App.css';
+import './tailwind.output.css';
 import * as PDFLib from 'pdf-lib';
 import * as pdfjs from 'pdfjs-dist/webpack';
-
+import Viewer from './Viewer';
 
 function App() {
   const [pdfFile, setPdfFile] = useState(null);
+  const [pdfUrl, setPdfUrl] = useState(null);
   const [picFiles, setPicFiles] = useState([]);
-  const canvas = useRef(null);
+  const canvasRef = useRef(null);
 
   useEffect(() => {
     async function effect() {
       if (!pdfFile) {
         return;
       }
-      const pdf = await pdfjs.getDocument(pdfFile.name).promise
-      const page = await pdf.getPage(1).promise;
-      const context = canvas.getContext('2d');
-      const viewport = page.getViewport({scale: 1.0});
+      const url = URL.createObjectURL(pdfFile);
+      setPdfUrl(url);
+      const pdf = await pdfjs.getDocument(url).promise;
+      const page = await pdf.getPage(1);
+      const context = canvasRef.current.getContext('2d');
+      const viewport = page.getViewport({scale: 0.5});
       const renderContext = {
         canvasContext: context,
         viewport: viewport
       };
-      await page.render(renderContext);
+      await page.render(renderContext).promise;
     }
     effect();
-  }, [pdfFile, canvas])
+  }, [pdfFile, canvasRef])
 
   async function convert() {
     if (!picFiles.length || !pdfFile) {
@@ -67,7 +70,9 @@ function App() {
     <br/>
     <button type="submit" onClick={convert}>Convert</button>
     <br/>
-    <canvas ref={canvas}/>
+    <canvas id="le-canvas" ref={canvasRef}/>
+    <br/>
+    <Viewer pdfUrl={pdfUrl}/>
   </>
 }
 

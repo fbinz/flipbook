@@ -1,12 +1,14 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
-import App from './App';
 import * as serviceWorker from './serviceWorker';
+import WorkArea from "./WorkArea";
+import {enableAllPlugins} from "immer";
+enableAllPlugins();
 
 ReactDOM.render(
   <React.StrictMode>
-    <App />
+    <WorkArea />
   </React.StrictMode>,
   document.getElementById('root')
 );
